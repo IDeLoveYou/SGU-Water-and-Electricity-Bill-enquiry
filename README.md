@@ -191,7 +191,7 @@ sessionId = 7BF0BB4CB2852??????233D03C9F6EBE    sessionId请自己爬取(session
 
   ![Fiddler_sessionId](https://foruda.gitee.com/images/1664715471522505522/bc013fbe_9532490.png)
 
-  **sessionId可以查到自己的隐私信息，包括本人身份证、信用卡余额、系别班级等，切勿流出**
+  **sessionId可以查到自己的隐私信息，包括本人身份证、校园卡余额、系别班级等，切勿流出**
 
   sessionId有有效期，一般20分钟左右无响应便会失效，但是当脚本运行时，会启动sessionId保活进程，于是只要脚本运行着，sessionId就不会失效，因此更需要注意sessionId不能流出，以及借用
 
