@@ -62,6 +62,14 @@ public class MainClass {
         }
     }
 
+    /**
+     * 主函数
+     *
+     * @param args [java.lang.String]
+     * @return void
+     * @author MoNo
+     * @since 2022/10/12 22:51
+     */
     public static void main(String[] args) {
         //启动参数测试脚本
         SettingCheck.initAndCheck();

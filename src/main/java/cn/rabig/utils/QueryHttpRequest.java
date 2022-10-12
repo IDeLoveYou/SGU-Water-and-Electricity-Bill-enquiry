@@ -29,6 +29,10 @@ public class QueryHttpRequest {
 
     /**
      * 获取水电费
+     *
+     * @return void
+     * @author MoNo
+     * @since 2022/10/12 22:53
      */
     public static void queryFees() {
         try {
@@ -62,5 +66,4 @@ public class QueryHttpRequest {
             queryFees();
         }
     }
-
 }

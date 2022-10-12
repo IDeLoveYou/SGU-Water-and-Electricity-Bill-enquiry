@@ -38,6 +38,14 @@ public class SendMess {
         sendMessage = HttpRequest.post(MainClass.userUrl).keepAlive(true).timeout(20000);
     }
 
+    /**
+     * 发送管理员信息
+     *
+     * @param error [java.lang.String]
+     * @return void
+     * @author MoNo
+     * @since 2022/10/12 22:53
+     */
     public static void sendError(String error) {
         try {
             CommonUtils.error(error);
@@ -52,6 +60,14 @@ public class SendMess {
 
     }
 
+    /**
+     * 发送用户信息
+     *
+     * @param message [java.lang.String]
+     * @return void
+     * @author MoNo
+     * @since 2022/10/12 22:53
+     */
     public static void sendMessage(String message) {
         try {
             CommonUtils.log(message);
@@ -64,5 +80,4 @@ public class SendMess {
             CommonUtils.error("息知发送失败(代号:1x002)，错误信息：" + e);
         }
     }
-
 }

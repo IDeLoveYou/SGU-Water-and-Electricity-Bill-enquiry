@@ -16,6 +16,10 @@ import java.math.BigDecimal;
 public class SettingCheck {
     /**
      * 测试sessionId参数
+     *
+     * @return void
+     * @author MoNo
+     * @since 2022/10/12 22:50
      */
     public static void checkSessionIdAndBuilding() {
         String responseBody = null;
@@ -49,6 +53,10 @@ public class SettingCheck {
 
     /**
      * 测试room参数
+     *
+     * @return void
+     * @author MoNo
+     * @since 2022/10/12 22:50
      */
     public static void checkRoom() {
         for (int i = 5; i <= 6; i++) {
@@ -77,7 +85,11 @@ public class SettingCheck {
     }
 
     /**
-     * 测试weekDay参数
+     * 测试room参数
+     *
+     * @return void
+     * @author MoNo
+     * @since 2022/10/12 22:50
      */
     private static void checkWeekDay() {
         if (MainClass.weekDay < 0 || MainClass.weekDay > 7) {
@@ -97,6 +109,10 @@ public class SettingCheck {
 
     /**
      * 测试Url参数
+     *
+     * @return void
+     * @author MoNo
+     * @since 2022/10/12 22:50
      */
     private static void checkUrl() {
         if (MainClass.checkUrlEnable) {
@@ -116,6 +132,10 @@ public class SettingCheck {
 
     /**
      * 测试waitTime参数
+     *
+     * @return void
+     * @author MoNo
+     * @since 2022/10/12 22:51
      */
     private static void checkWaitTime() {
         if (MainClass.waitTime == null || MainClass.waitTime < 2) {
@@ -126,6 +146,10 @@ public class SettingCheck {
 
     /**
      * 测试lowMoney参数
+     *
+     * @return void
+     * @author MoNo
+     * @since 2022/10/12 22:51
      */
     private static void checkLowMoney() {
         if (MainClass.electricityLowMoney == null || MainClass.waterLowMoney == null) {
@@ -134,6 +158,13 @@ public class SettingCheck {
         }
     }
 
+    /**
+     * 初始化和测试
+     *
+     * @return void
+     * @author MoNo
+     * @since 2022/10/12 22:51
+     */
     public static void initAndCheck() {
         CommonUtils.log("参数测试程序启动");
         checkSessionIdAndBuilding();
@@ -155,5 +186,4 @@ public class SettingCheck {
                 `--`-`--`--'   `--`         `-._`.___,'   `--`-`    `--`------'  \s
                 """);
     }
-
 }
