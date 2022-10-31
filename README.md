@@ -197,6 +197,8 @@ sessionId = 7BF0BB4CB2852??????233D03C9F6EBE    sessionId请自己爬取(session
 
 # 使用教程
 
+> 跳转至下载地址：[SGU-Water-and-Electricity-Bill-enquiry](../../releases)
+
 ## jar
 
 * 拥有`jre`环境
