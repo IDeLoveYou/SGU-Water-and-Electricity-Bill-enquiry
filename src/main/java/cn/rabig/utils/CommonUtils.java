@@ -46,7 +46,7 @@ public class CommonUtils {
         try {
             Thread.sleep(time);
         } catch (InterruptedException e) {
-            SendMess.sendError("脚本发生异常(代号:0x001)，脚本立即退出，错误信息：" + e + "\n");
+            SendMess.sendAdminError("脚本发生异常(代号:0x001)，脚本立即退出，错误信息：" + e + "\n");
             e.printStackTrace();
             System.exit(1);//异常退出
         }

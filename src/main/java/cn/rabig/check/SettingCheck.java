@@ -8,6 +8,7 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.rabig.main.MainClass;
 import cn.rabig.utils.CommonUtils;
+import cn.rabig.utils.LoginUtils;
 import cn.rabig.utils.QueryHttpRequest;
 import cn.rabig.utils.SendMess;
 
@@ -15,7 +16,30 @@ import java.math.BigDecimal;
 
 public class SettingCheck {
     /**
-     * 测试sessionId参数
+     * 测试Url参数
+     *
+     * @return void
+     * @author MoNo
+     * @since 2022/10/12 22:50
+     */
+    private static void checkUrl() {
+        if (MainClass.checkUrlEnable) {
+            try {
+                //请求息知
+                SendMess.sendAdmin.body("title=韶关学院水电费提醒脚本管理员通知(v" + MainClass.version + ")，息知收发检查&" +
+                        "content=" + SendMess.adminInfo).execute();
+                SendMess.sendUser.body("title=\n韶关学院水电费提醒脚本用户通知(v" + MainClass.version + ")，息知收发检查&" +
+                        "content=" + SendMess.upInfo).execute();
+            } catch (Exception e) {
+                CommonUtils.error("息知发送失败，请检查用户以及管理员的推送Url");
+                CommonUtils.exit();
+            }
+            CommonUtils.log("已往息知发送测试信息，请自行查看是否收到");
+        }
+    }
+
+    /**
+     * 测试building参数
      *
      * @return void
      * @author MoNo
@@ -26,7 +50,7 @@ public class SettingCheck {
         try {
             responseBody = HttpRequest
                     .post("http://210.38.192.117/wechat/basicQuery/queryElecBuilding.html")
-                    .cookie("JSESSIONID=" + MainClass.sessionId)
+                    .cookie(LoginUtils.JSESSIONID)
                     .keepAlive(false)
                     .body("aid=0030000000002505&area={\"area\":\"1\",\"areaname\":\"韶关学院\"}")
                     .timeout(20000)
@@ -35,15 +59,11 @@ public class SettingCheck {
             CommonUtils.error("请检查网络连接，企业微信水电费查询是否能够正常使用，或者学校可能已经更换查询接口（几率较低）");
             CommonUtils.exit();
         }
-        if ("{\"errmsg\":\"会话已超时，请尝试重新访问业务应用。\",\"retcode\":\"91001\"}".equals(responseBody)) {
-            CommonUtils.error("sessionId已过期，请检查sessionId");
-            CommonUtils.exit();
-        }
         JSONArray buildingList = JSONUtil.parseObj(responseBody).getJSONArray("buildingtab");
         boolean find = buildingList.stream().anyMatch(building -> {
-            JSONObject buildingInFo = JSONUtil.parseObj(building);
-            QueryHttpRequest.buildingId = (String) buildingInFo.get("buildingid");
-            return MainClass.building.equals(buildingInFo.get("building"));
+            JSONObject buildingInfo = JSONUtil.parseObj(building);
+            QueryHttpRequest.buildingId = (String) buildingInfo.get("buildingid");
+            return MainClass.building.equals(buildingInfo.get("building"));
         });
         if (!find) {
             CommonUtils.error("请检查建筑名称是否正确，详细建筑名称格式在README.md");
@@ -85,7 +105,7 @@ public class SettingCheck {
     }
 
     /**
-     * 测试room参数
+     * 测试WeekDay参数
      *
      * @return void
      * @author MoNo
@@ -104,29 +124,6 @@ public class SettingCheck {
             case 5 -> MainClass.weekDayString = "FRL";
             case 6 -> MainClass.weekDayString = "SAT";
             case 7 -> MainClass.weekDayString = "SUN";
-        }
-    }
-
-    /**
-     * 测试Url参数
-     *
-     * @return void
-     * @author MoNo
-     * @since 2022/10/12 22:50
-     */
-    private static void checkUrl() {
-        if (MainClass.checkUrlEnable) {
-            try {
-                //请求息知
-                SendMess.sendError.body("title=韶关学院水电费提醒脚本管理员通知(v" + MainClass.version + ")&" +
-                        "content=" + SendMess.adminInfo).execute();
-                SendMess.sendMessage.body("title=\n欢迎使用韶关学院水电费提醒脚本(v" + MainClass.version + ")&" +
-                        "content=" + SendMess.upInfo).execute();
-            } catch (Exception e) {
-                CommonUtils.error("息知发送失败，请检查用户以及管理员的推送Url");
-                CommonUtils.exit();
-            }
-            CommonUtils.log("已往息知发送测试信息，请自行查看是否收到");
         }
     }
 
@@ -167,23 +164,29 @@ public class SettingCheck {
      */
     public static void initAndCheck() {
         CommonUtils.log("参数测试程序启动");
+        //首先检查息知是否能正常接收信息，确保进行登录验证
+        checkUrl();
+        //开始登录
+        LoginUtils.qrLogin();
+        //登录成功检查参数
         checkSessionIdAndBuilding();
         checkWeekDay();
         checkWaitTime();
         checkLowMoney();
         checkRoom();
-        checkUrl();
         CommonUtils.log("所有参数检测完成，即将启动脚本\n");
         Console.log("""
-                                 ,---.                      .=-.-.       _,---.  \s
-                  .-.,.---.    .--.'  \\         _..---.    /==/_ /   _.='.'-,  \\ \s
-                 /==/  `   \\   \\==\\-/\\ \\      .' .'.-. \\  |==|, |   /==.'-     / \s
-                |==|-, .=., |  /==/-|_\\ |    /==/- '=' /  |==|  |  /==/ -   .-'  \s
-                |==|   '='  /  \\==\\,   - \\   |==|-,   '   |==|- |  |==|_   /_,-. \s
-                |==|- ,   .'   /==/ -   ,|   |==|  .=. \\  |==| ,|  |==|  , \\_.' )\s
-                |==|_  . ,'.  /==/-  /\\ - \\  /==/- '=' ,| |==|- |  \\==\\-  ,    ( \s
-                /==/  /\\ ,  ) \\==\\ _.\\=\\.-' |==|   -   /  /==/. /   /==/ _  ,  / \s
-                `--`-`--`--'   `--`         `-._`.___,'   `--`-`    `--`------'  \s
+                 $$$$$$\\ $$$$$$$\\            $$\\                                 $$\\     $$\\                  \s
+                 \\_$$  _|$$  __$$\\           $$ |                                \\$$\\   $$  |                 \s
+                   $$ |  $$ |  $$ | $$$$$$\\  $$ |      $$$$$$\\ $$\\    $$\\  $$$$$$\\\\$$\\ $$  /$$$$$$\\  $$\\   $$\\\s
+                   $$ |  $$ |  $$ |$$  __$$\\ $$ |     $$  __$$\\\\$$\\  $$  |$$  __$$\\\\$$$$  /$$  __$$\\ $$ |  $$ |
+                   $$ |  $$ |  $$ |$$$$$$$$ |$$ |     $$ /  $$ |\\$$\\$$  / $$$$$$$$ |\\$$  / $$ /  $$ |$$ |  $$ |
+                   $$ |  $$ |  $$ |$$   ____|$$ |     $$ |  $$ | \\$$$  /  $$   ____| $$ |  $$ |  $$ |$$ |  $$ |
+                 $$$$$$\\ $$$$$$$  |\\$$$$$$$\\ $$$$$$$$\\\\$$$$$$  |  \\$  /   \\$$$$$$$\\  $$ |  \\$$$$$$  |\\$$$$$$  |
+                 \\______|\\_______/  \\_______|\\________|\\______/    \\_/     \\_______| \\__|   \\______/  \\______/\s
+                                                                                                              \s
+                                                                                                              \s
+                                                                                                              \s
                 """);
     }
 }

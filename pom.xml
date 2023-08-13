@@ -6,7 +6,7 @@
 
     <groupId>cn.rabig</groupId>
     <artifactId>SGU-Water-and-Electricity-Bill-enquiry</artifactId>
-    <version>4.4</version>
+    <version>4.5</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -45,6 +45,11 @@
             <groupId>me.tongfei</groupId>
             <artifactId>progressbar</artifactId>
             <version>0.9.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.microsoft.playwright</groupId>
+            <artifactId>playwright</artifactId>
+            <version>1.36.0</version>
         </dependency>
     </dependencies>
 

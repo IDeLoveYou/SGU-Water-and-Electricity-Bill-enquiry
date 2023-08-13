@@ -31,9 +31,9 @@ public class MainClass {
     public static boolean checkUrlEnable;
     static boolean weekEnable;
     public static int weekDay;
+    public static int verificationCount;
     public static String weekDayString;
-    public static String sessionId;
-    public static String version = "4.4";
+    public static String version = "4.5";
 
     static {
         //初始化配置文件
@@ -47,12 +47,12 @@ public class MainClass {
             electricityLowMoney = props.getBigDecimal("electricityLowMoney");
             waterLowMoney = props.getBigDecimal("waterLowMoney");
             waitTime = props.getFloat("waitTime");
-            checkUrlEnable = props.getBool("checkUrlEnable");
             feeUpEnable = props.getBool("feeUpEnable");
+            checkUrlEnable = props.getBool("checkUrlEnable");
             weekEnable = props.getBool("weekEnable");
             weekDay = props.getInt("weekDay");
-            sessionId = props.getProperty("sessionId");
-            if (StrUtil.hasBlank(room, building, adminUrl, userUrl, sessionId)) {
+            verificationCount = props.getInt("verificationCount");
+            if (StrUtil.hasBlank(room, building, adminUrl, userUrl)) {
                 CommonUtils.error("请按照规定完善配置文件！");
                 CommonUtils.exit();
             }
@@ -60,6 +60,8 @@ public class MainClass {
             CommonUtils.error("请检查配置文件是否存在并按照规定要求填写！");
             CommonUtils.exit();
         }
+        //启动参数测试脚本
+        SettingCheck.initAndCheck();
     }
 
     /**
@@ -71,8 +73,6 @@ public class MainClass {
      * @since 2022/10/12 22:51
      */
     public static void main(String[] args) {
-        //启动参数测试脚本
-        SettingCheck.initAndCheck();
         //初始化周报部分的两个定时任务
         if (weekEnable) {
             //每星期一清除一次周费
@@ -81,7 +81,7 @@ public class MainClass {
                 QueryHttpRequest.weekWaterFee = BigDecimal.valueOf(0);
             });
             //周费提醒
-            CronUtil.schedule("0 0 8 ? * " + weekDayString, (Task) () -> SendMess.sendMessage("本周电费花费：" + QueryHttpRequest.weekElectricityFee + "元\n水费花费：" + QueryHttpRequest.weekWaterFee + "元"));
+            CronUtil.schedule("0 0 8 ? * " + weekDayString, (Task) () -> SendMess.sendUserInfo("水电费周报", "本周电费花费：" + QueryHttpRequest.weekElectricityFee + "元\n水费花费：" + QueryHttpRequest.weekWaterFee + "元"));
             CronUtil.start();
         }
         //创建定时器循环主函数部分
@@ -93,17 +93,19 @@ public class MainClass {
 
                 //低额提醒部分
                 if (QueryHttpRequest.waitFlag) {
+                    String title = "";
                     String message = "";
                     if (QueryHttpRequest.newElectricityFee.compareTo(electricityLowMoney) < 0) {
-                        message = "电费剩余：" + QueryHttpRequest.newElectricityFee + "元，电费小于" + electricityLowMoney + "元\n";
+                        title = "电费不足";
+                        message = "- 电费剩余：" + QueryHttpRequest.newElectricityFee + "元，电费小于" + electricityLowMoney + "元\n";
                     }
                     if (QueryHttpRequest.newWaterFee.compareTo(waterLowMoney) < 0) {
-                        message = message + "水费剩余：" + QueryHttpRequest.newWaterFee + "元，水费小于" + waterLowMoney + "元\n";
+                        title = title + "，水费不足";
+                        message = message + "- 水费剩余：" + QueryHttpRequest.newWaterFee + "元，水费小于" + waterLowMoney + "元\n";
                     }
-                    if (!"".equals(message)) {
-                        message = message + "提示将在" + new DecimalFormat("###.##").format(waitTime) + "小时后再次提醒您，请及时充值\n" +
-                                "若您已充值，请忽略此提示，企业微信更新余额存在延迟";
-                        SendMess.sendMessage(message);
+                    if (!message.isEmpty()) {
+                        message = message + "- 脚本将在" + new DecimalFormat("###.##").format(waitTime) + "小时后再次提醒您，请及时充值\n- 若您已充值，请忽略此提醒\n- 企业微信更新余额存在延迟";
+                        SendMess.sendUserInfo(title, message);
                         QueryHttpRequest.waitFlag = false;
                         new Thread(() -> {
                             CommonUtils.sleep((int) (waitTime * 3600 * 1000));
@@ -115,10 +117,10 @@ public class MainClass {
                 //充值提醒部分
                 if (feeUpEnable) {
                     if (QueryHttpRequest.oldElectricityFee.compareTo(QueryHttpRequest.newElectricityFee) < 0) {
-                        SendMess.sendMessage("电费充值成功，充值金额" + QueryHttpRequest.newElectricityFee.subtract(QueryHttpRequest.oldElectricityFee) + "元，信息可能有延迟");
+                        SendMess.sendUserInfo("电费充值成功", "电费充值成功，充值金额" + QueryHttpRequest.newElectricityFee.subtract(QueryHttpRequest.oldElectricityFee) + "元，信息可能有延迟");
                     }
                     if (QueryHttpRequest.oldWaterFee.compareTo(QueryHttpRequest.newWaterFee) < 0) {
-                        SendMess.sendMessage("水费充值成功，充值金额" + QueryHttpRequest.newWaterFee.subtract(QueryHttpRequest.oldWaterFee) + "元，信息可能有延迟");
+                        SendMess.sendUserInfo("水费充值成功", "水费充值成功，充值金额" + QueryHttpRequest.newWaterFee.subtract(QueryHttpRequest.oldWaterFee) + "元，信息可能有延迟");
                     }
                 }
 

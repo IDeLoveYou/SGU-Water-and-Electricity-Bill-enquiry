@@ -22,7 +22,7 @@ public class QueryHttpRequest {
     static {
         queryFeeRequest = HttpRequest
                 .post("http://210.38.192.117/wechat/basicQuery/queryElecRoomInfo.html")
-                .cookie("JSESSIONID=" + MainClass.sessionId)
+                .cookie(LoginUtils.JSESSIONID)
                 .keepAlive(true)
                 .timeout(20000);//超时，毫秒
     }
@@ -44,8 +44,10 @@ public class QueryHttpRequest {
                         "room={\"room\":\"\",\"roomid\":\"" + MainClass.room + "\"}");
                 String errmsg = JSONUtil.parseObj(queryFeeRequest.execute().body()).get("errmsg").toString();
                 if ("会话已超时，请尝试重新访问业务应用。".equals(errmsg)) {
-                    SendMess.sendError("sessionId已过期，脚本即将退出");
-                    CommonUtils.exit();
+                    SendMess.sendAdminError("sessionId已过期，脚本即将退出");
+                    //重新尝试登录
+                    SendMess.sendAdminInfo("登录失效，重新发起登录请求");
+                    LoginUtils.qrLogin();
                 } else if (!errmsg.contains("元")) {
                     throw new Exception();//获取到的数据不符合预期
                 }
