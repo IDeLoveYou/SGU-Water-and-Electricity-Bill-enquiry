@@ -6,7 +6,7 @@
 
     <groupId>cn.rabig</groupId>
     <artifactId>SGU-Water-and-Electricity-Bill-enquiry</artifactId>
-    <version>4.5</version>
+    <version>4.5.1</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -63,6 +63,8 @@
                     <archive>
                         <manifest>
                             <!-- <mainClass>入口类，main 方法所在位置</mainClass> -->
+                            <!-- 注意！此类不可继承 javafx 的 Application -->
+                            <!-- 请独立 main 方法为一个类，并使用 Application.launch() 启动 JavaFX -->
                             <mainClass>cn.rabig.main.MainClass</mainClass>
                         </manifest>
                     </archive>
