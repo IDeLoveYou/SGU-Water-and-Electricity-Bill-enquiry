@@ -100,6 +100,7 @@ public class LoginUtils {
                 SendMess.sendAdminInfo("二维码登录验证成功");
             }
         } else {
+            SendMess.sendAdminError("登录验证超时，退出脚本");
             //登录超过次数，退出脚本
             CommonUtils.exit();
         }
