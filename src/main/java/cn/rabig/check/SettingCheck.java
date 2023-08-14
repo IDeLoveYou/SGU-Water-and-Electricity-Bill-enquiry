@@ -3,16 +3,16 @@ package cn.rabig.check;
 import cn.hutool.core.lang.Console;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
 import cn.rabig.main.MainClass;
 import cn.rabig.utils.CommonUtils;
 import cn.rabig.utils.LoginUtils;
 import cn.rabig.utils.QueryHttpRequest;
 import cn.rabig.utils.SendMess;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 public class SettingCheck {
     /**
@@ -59,11 +59,11 @@ public class SettingCheck {
             CommonUtils.error("请检查网络连接，企业微信水电费查询是否能够正常使用，或者学校可能已经更换查询接口（几率较低）");
             CommonUtils.exit();
         }
-        JSONArray buildingList = JSONUtil.parseObj(responseBody).getJSONArray("buildingtab");
+        JSONArray buildingList = Objects.requireNonNull(JSONObject.parseObject(responseBody)).getJSONArray("buildingtab");
         boolean find = buildingList.stream().anyMatch(building -> {
-            JSONObject buildingInfo = JSONUtil.parseObj(building);
-            QueryHttpRequest.buildingId = (String) buildingInfo.get("buildingid");
-            return MainClass.building.equals(buildingInfo.get("building"));
+            JSONObject buildingInfo = JSONObject.parseObject(building.toString());
+            QueryHttpRequest.buildingId = buildingInfo.getString("buildingid");
+            return MainClass.building.equals(buildingInfo.getString("building"));
         });
         if (!find) {
             CommonUtils.error("请检查建筑名称是否正确，详细建筑名称格式在README.md");
@@ -86,7 +86,7 @@ public class SettingCheck {
                     "floor={\"floorid\":\"\",\"floor\":\"\"}&" +
                     "room={\"room\":\"\",\"roomid\":\"" + MainClass.room + "\"}");
             String responseBody = QueryHttpRequest.queryFeeRequest.execute().body();
-            JSONObject responseJson = JSONUtil.parseObj(responseBody);
+            JSONObject responseJson = JSONObject.parseObject(responseBody);
             if ("无法获取房间信息".equals(responseJson.get("errmsg"))) {
                 CommonUtils.error("无法获取房间信息，请检查房间号是否正确");
                 CommonUtils.exit();

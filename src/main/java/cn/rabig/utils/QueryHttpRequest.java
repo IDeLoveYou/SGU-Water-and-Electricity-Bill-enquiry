@@ -2,8 +2,8 @@ package cn.rabig.utils;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
-import cn.hutool.json.JSONUtil;
 import cn.rabig.main.MainClass;
+import com.alibaba.fastjson2.JSONObject;
 
 import java.math.BigDecimal;
 
@@ -42,7 +42,7 @@ public class QueryHttpRequest {
                         "building={\"building\":\"\",\"buildingid\":\"" + buildingId + "\"}&" +
                         "floor={\"floorid\":\"\",\"floor\":\"\"}&" +
                         "room={\"room\":\"\",\"roomid\":\"" + MainClass.room + "\"}");
-                String errmsg = JSONUtil.parseObj(queryFeeRequest.execute().body()).get("errmsg").toString();
+                String errmsg = JSONObject.parseObject(queryFeeRequest.execute().body()).getString("errmsg");
                 if ("会话已超时，请尝试重新访问业务应用。".equals(errmsg)) {
                     SendMess.sendAdminError("sessionId已过期，脚本即将退出");
                     //重新尝试登录

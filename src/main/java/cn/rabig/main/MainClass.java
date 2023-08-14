@@ -33,7 +33,7 @@ public class MainClass {
     public static int weekDay;
     public static int verificationCount;
     public static String weekDayString;
-    public static String version = "4.5.1";
+    public static String version = "4.5.2";
 
     static {
         //初始化配置文件
